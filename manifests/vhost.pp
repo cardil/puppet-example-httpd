@@ -27,7 +27,7 @@ define httpd::vhost(
     mode   => '0755',
   }
 
-  file { "${vhostdir}/${servername}.conf":
+  file { "${vhostdir}/vhost-${servername}.conf":
     ensure  => 'file',
     mode    => '0644',
     content => epp('httpd/vhost.conf.epp', $context),
