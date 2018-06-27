@@ -1,0 +1,7 @@
+<VirtualHost *:<%= $port %>>
+    DocumentRoot "<%= $docroot %>"
+    ServerName <%= $servername %>
+
+    # Other directives here
+    <%= $custom_fragment %>
+</VirtualHost>
