@@ -5,10 +5,10 @@
 # @example
 #   httpd::vhost { 'namevar': }
 define httpd::vhost(
-  $docroot,
-  $servername      = $name,
-  $port            = 80,
-  $custom_fragment = '',
+  Httpd::AbsolutePath $docroot,
+  String              $servername      = $name,
+  Integer[80, 64000]  $port            = 80,
+  Optional[String]    $custom_fragment = '',
 ) {
 
   include httpd

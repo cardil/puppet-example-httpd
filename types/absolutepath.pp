@@ -1,0 +1,1 @@
+type Httpd::AbsolutePath = Pattern[/^\/([^\/]+\/?)*$/]
