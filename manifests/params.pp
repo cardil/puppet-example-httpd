@@ -5,10 +5,16 @@
 # @example
 #   include httpd::params
 class httpd::params (
-  $wwwdir = '/var/www',
+  Httpd::AbsolutePath $wwwdir = '/var/www',
   ) {
   $vhostdir = $::facts['os']['family'] ? {
     'Debian' => '/etc/apache2/sites-enabled',
     'RedHat' => '/etc/httpd/conf.d',
   }
+  $pkg = $::facts['os']['family'] ? {
+    'Debian' => 'apache2',
+    'RedHat' => 'httpd',
+    default  => fail("Unsupported operating system ${facts[os][name]} ${facts[os][release][full]}")
+  }
+  $service = $pkg
 }

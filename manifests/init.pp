@@ -4,37 +4,16 @@
 #
 # @example
 #   include httpd
-class httpd {
-  include httpd::params
-  $pkg = $::facts['os']['family'] ? {
-    'Debian' => 'apache2',
-    'RedHat' => 'httpd',
-    default  => fail("Unsupported operating system ${facts[os][name]} ${facts[os][release][full]}")
-  }
-  $service = $pkg
-  $wwwdir  = $httpd::params::wwwdir
+class httpd (
+  Httpd::AbsolutePath $wwwdir = $httpd::params::wwwdir,
+  ) inherits httpd::params {
 
-  package { $pkg:
-    ensure => 'installed',
-  }
+  contain httpd::internal::install
+  contain httpd::internal::configure
+  contain httpd::internal::service
 
-  $context = {
-    'osname'    => $::facts['os']['name'],
-    'osversion' => $::facts['os']['release']['full'],
-  }
+  Class['httpd::internal::install']
+  -> Class['httpd::internal::configure']
+  ~> Class['httpd::internal::service']
 
-  file { "${wwwdir}/index.html":
-    ensure  => 'file',
-    mode    => '0644',
-    content => epp('httpd/index.hello.epp', $context),
-    require => Package[$pkg],
-  }
-
-  service { $service:
-    ensure     => 'running',
-    enable     => true,
-    hasrestart => true,
-    hasstatus  => true,
-    subscribe  => File["${wwwdir}/index.html"],
-  }
 }

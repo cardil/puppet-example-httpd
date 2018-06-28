@@ -12,7 +12,6 @@ define httpd::vhost(
 ) {
 
   include httpd
-  include httpd::params
 
   $context = {
     'docroot'         => $docroot,
@@ -20,7 +19,7 @@ define httpd::vhost(
     'port'            => $port,
     'custom_fragment' => $custom_fragment,
   }
-  $vhostdir = $httpd::params::vhostdir
+  $vhostdir = $httpd::vhostdir
 
   file { $docroot:
     ensure => 'directory',
@@ -32,9 +31,9 @@ define httpd::vhost(
     mode    => '0644',
     content => epp('httpd/vhost.conf.epp', $context),
     require => [
-      Package[$httpd::pkg],
+      Class['httpd::internal::install'],
       File[$docroot],
     ],
-    notify  => Service[$httpd::service],
+    notify  => Class['httpd::internal::service'],
   }
 }
