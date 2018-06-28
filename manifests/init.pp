@@ -6,17 +6,14 @@
 #   include httpd
 class httpd {
   include httpd::params
-  $pkg = $::facts['os']['family'] ? {
-    'Debian' => 'apache2',
-    'RedHat' => 'httpd',
-    default  => fail("Unsupported operating system ${facts[os][name]} ${facts[os][release][full]}")
-  }
-  $service = $pkg
-  $wwwdir  = $httpd::params::wwwdir
 
-  package { $pkg:
-    ensure => 'installed',
+  include httpd::stages
+  class { 'httpd::install':
+    stage => 'install',
   }
+  include httpd::service
+
+  $wwwdir  = $httpd::params::wwwdir
 
   $context = {
     'osname'    => $::facts['os']['name'],
@@ -27,14 +24,6 @@ class httpd {
     ensure  => 'file',
     mode    => '0644',
     content => epp('httpd/index.hello.epp', $context),
-    require => Package[$pkg],
-  }
-
-  service { $service:
-    ensure     => 'running',
-    enable     => true,
-    hasrestart => true,
-    hasstatus  => true,
-    subscribe  => File["${wwwdir}/index.html"],
+    require => Package[$httpd::install::pkg],
   }
 }
